@@ -1,0 +1,148 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct avltree{
+	struct avltree *left;
+	int data;
+	struct avltree *right;
+	int height;
+};
+
+struct avltree *newnode(int value);                        //fun for creating new node
+struct avltree *rightrotate(struct avltree *x);            
+struct avltree *leftrotate(struct avltree *x);
+void preorder(struct avltree *root);
+void inorder(struct avltree *root);
+int height(struct avltree *root);
+int max(int a, int b);
+struct avltree *avl_insert(struct avltree *root, int value); //inserting node in AVL tree
+
+void main()
+{
+	int i;
+	int n;
+	int value;
+	struct avltree *root;
+	root = NULL;
+
+	scanf("%d", &n);                                        //n represents number of inputs from user
+
+	for(i = 0; i < n; i++){                                 //taking n inputs from user
+		scanf("%d", &value);
+		root = avl_insert(root, value);
+	}
+	printf("Inorer: ");
+	inorder(root);
+	printf("\nPreorder: ");
+	preorder(root);
+	printf("\n");
+}
+
+
+struct avltree *newnode(int value)
+{
+	struct avltree *temp;
+	temp = (struct avltree*)malloc(sizeof(struct avltree));
+	temp->left = temp->right = NULL;
+	temp->data = value;
+	temp->height = 0;
+	return temp;
+}
+
+struct avltree *rightrotate(struct avltree *x)
+{
+	struct avltree *y;
+	y = x->left;
+	x->left = y->right;
+	y->right = x;
+	x->height = max(height(x->left), height(x->right)) + 1;
+	y->height = max(height(y->left), height(y->right)) + 1;
+	return y;
+}
+
+struct avltree *leftrotate(struct avltree *x)
+{
+	struct avltree *y;
+	y = x->right;
+	x->right = y->left;
+	y->left = x;
+	x->height = max(height(x->left), height(x->right)) + 1;
+	y->height = max(height(y->left), height(y->right)) + 1;
+	return y;
+}
+
+void preorder(struct avltree *root)
+{
+	if(root){
+		printf("%d ", root->data);
+		preorder(root->left);
+		preorder(root->right);
+	}
+}
+
+int height(struct avltree *root)
+{
+	if(!root)
+		return -1;
+	else
+		return root->height;
+}
+
+int max(int a, int b)
+{
+	if(a > b)
+		return a;
+	else
+		return b;
+}
+
+struct avltree *avl_insert(struct avltree *root, int value)
+{
+	int bal;
+	int h;
+
+	if(!root){
+		return newnode(value);
+	}
+	if(root->data > value){
+		root->left = avl_insert(root->left, value);
+	}else{
+		root->right = avl_insert(root->right, value);
+	}
+
+	bal = height(root->left) - height(root->right);
+	
+	if(bal > 1){
+		if(height(root->left->left) > height(root->left->right)){
+			root = rightrotate(root);
+			return root;
+		}else{
+			root->left = leftrotate(root->left);
+			root = rightrotate(root);
+			return root;
+		}
+	}
+	if(bal < -1){
+		if(height(root->right->right) > height(root->right->left)){
+			root = leftrotate(root);
+			return root;
+		}else{
+			root->right = rightrotate(root->right);
+			root = leftrotate(root);
+			return root;
+		}
+	}
+
+	root->height = max(height(root->left), height(root->right)) + 1;
+	return root;
+}
+
+void inorder(struct avltree *root)
+{
+	if(root){
+		inorder(root->left);
+		printf("%d ", root->data);
+		inorder(root->right);
+	}
+}
+
