@@ -1,0 +1,146 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct bsttree{
+	struct bsttree *left;
+	int data;
+	struct bsttree *right;
+};
+struct bsttree *newnode(int value);                            //creating new node
+struct bsttree *bst_insert(struct bsttree *root, int value);   //inserting node in BST
+void preorder(struct bsttree *root);
+void inorder(struct bsttree *root);
+void postorder(struct bsttree *root);
+int bst_height(struct bsttree *x);                             //finding height of BST
+int max(int a, int b);
+struct bsttree *bst_search(struct bsttree *root, int data);   //Searching a node in BST
+
+void main()
+{
+	int i;
+	int n;
+	int value;
+	int height;
+	struct bsttree *temp;
+	struct bsttree *root;
+	
+	temp = NULL;
+	root = NULL;
+
+	scanf("%d", &n);                                           // number of nodes for insertions
+
+	for(i = 0; i < n; i++){
+		scanf("%d", &value);
+		root = bst_insert(root, value);
+	}
+
+	printf("PreOrder: ");
+	preorder(root);
+	printf("\nInOrder: ");
+	inorder(root);
+	printf("\nPostOrder: ");
+	postorder(root);
+	printf("\n");
+
+	printf("Enter the value whose hight want to know: ");
+	scanf("%d", &value);
+
+	temp = bst_search(root, value);                          //searching the node whose height need to be calculated
+	if(temp == NULL){
+		printf("No such value exist");
+	}else if(temp->data == value){
+		height = bst_height(temp);
+		printf("height: %d\n", height);
+	}
+
+}
+
+struct bsttree *newnode(int value)
+{
+	struct bsttree *temp;
+	temp = (struct bsttree *)malloc(sizeof(struct bsttree));
+	temp->data = value;
+	temp->left = temp->right = NULL;
+	return temp;
+}
+
+struct bsttree *bst_insert(struct bsttree *root, int value)
+{
+	if(!root){
+		return newnode(value);
+	}
+
+	if(value < root->data){
+		root->left = bst_insert(root->left, value);
+	}else{
+		root->right = bst_insert(root->right, value);
+	}
+
+	return root;
+}
+
+void preorder(struct bsttree *root)
+{
+	if(root){
+	printf("%d ", root->data);
+	preorder(root->left);
+	preorder(root->right);
+	}
+}
+
+void inorder(struct bsttree *root)
+{
+	if(root){
+		inorder(root->left);
+		printf("%d ", root->data);
+		inorder(root->right);
+	}
+}
+
+void postorder(struct bsttree *root)
+{
+	if(root){
+		postorder(root->left);
+		postorder(root->right);
+		printf("%d ", root->data);
+	}
+}
+
+int bst_height(struct bsttree *x)
+{
+	int height;
+	if(!x){
+		return 1;
+	}else if(x->left == NULL && x->right == NULL){
+		return 1;
+	}else{
+		height = max(bst_height(x->left), bst_height(x->right)) + 1;
+		return height;
+	}
+}
+
+struct bsttree *bst_search(struct bsttree *root, int data)
+{
+	struct bsttree *temp;
+	temp = NULL;
+
+	if(root == NULL){
+		return temp;
+	}
+	if(root->data == data){
+		temp = root;
+	}else if(root->data > data){
+		temp = bst_search(root->left, data);
+	}else{
+		temp = bst_search(root->right, data);
+	}
+	return temp;
+}
+
+int max(int a, int b)
+{
+	if(a > b)
+		return a;
+	else
+		return b;
+}
